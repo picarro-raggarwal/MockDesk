@@ -1,6 +1,6 @@
 # MockDesk
 
-MockDesk is a **mock REST API workbench** for frontend teams. Define endpoints with paths, HTTP methods, multiple JSON responses, artificial delays, status codes, optional **path version prefixes**, and **conditional responses** (headers, query, body substring). Data persists in the browser (Zustand + localStorage), with **v1.1 JSON** import/export, **OpenAPI** import, **compressed share links**, and Node servers for **HTTP + WebSocket** outside the app: a **live mock gateway** (UI pushes changes to a local server) and a **file-based companion** (export JSON / CI).
+MockDesk is a **mock REST API workbench** for frontend teams. Define endpoints with paths, HTTP methods, multiple JSON responses, artificial delays, status codes, optional **path version prefixes**, and **conditional responses** (headers, query, body substring). Data persists in the browser (Zustand + localStorage), with **v1.1 JSON** import/export, **compressed share links**, and Node servers for **HTTP + WebSocket** outside the app: a **live mock gateway** (UI pushes changes to a local server) and a **file-based companion** (export JSON / CI).
 
 ## Stack
 
@@ -10,7 +10,7 @@ MockDesk is a **mock REST API workbench** for frontend teams. Define endpoints w
 - React Hook Form + Zod  
 - Monaco Editor (JSON), lazy-loaded  
 - Framer Motion, React Router 6  
-- `@faker-js/faker`, `idb` (IndexedDB audit log), `lz-string` (share links), `js-yaml` (OpenAPI)  
+- `@faker-js/faker`, `idb` (IndexedDB audit log), `lz-string` (share links)  
 - **PWA** via `vite-plugin-pwa` (auto-update service worker)  
 
 ## Scripts
@@ -60,7 +60,7 @@ Step-by-step: [docs/external-http-mocks.md](docs/external-http-mocks.md).
 - **WS lab** — script preview in the browser; **Live stream** tab connects to the companion WebSocket for the same payloads a real client would receive  
 - **Mock engine** — pathname + method + optional `matchWhen`; templates via current environment  
 - **Playground** — headers JSON, body text, timing  
-- **Import / export** — JSON **v1.1** (collections, APIs, environments, `currentEnvId`, `wsScenarios`); merge preview; OpenAPI tab; **`?share=`** compressed payload (any route redirects to Import / Export)  
+- **Import / export** — JSON **v1.1** (collections, APIs, environments, `currentEnvId`, `wsScenarios`); merge preview; **`?share=`** compressed payload (any route redirects to Import / Export)  
 - **Settings** — full backup, danger zone, storage estimate  
 - **Keyboard shortcuts** — `?` help; `g` then `a` / `p` / `i` / `e` for APIs, Playground, Import/Export, Environments (outside inputs)  
 - **Theme** — light / dark (persisted)  

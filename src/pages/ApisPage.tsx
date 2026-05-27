@@ -34,6 +34,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { displayApiPath, displayApiPathWithQuery } from "@/utils/pathJoin";
 import { cn } from "@/lib/utils";
 import type { HttpMethod, MockApi, MockResponse } from "@/types/models";
+import { GuideHint } from "@/components/GuideHint";
 
 const METHODS: HttpMethod[] = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
@@ -136,7 +137,10 @@ export function ApisPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">APIs</h1>
+          <div className="flex items-start gap-2">
+            <h1 className="text-3xl font-bold tracking-tight">APIs</h1>
+            <GuideHint section="collections-apis" className="mt-1" />
+          </div>
           <p className="mt-1 max-w-xl text-muted-foreground">
             Click the <strong className="font-medium text-foreground">chevron</strong> on a row to expand and preview
             all responses, headers, and query docs. <strong className="font-medium text-foreground">New API</strong> opens

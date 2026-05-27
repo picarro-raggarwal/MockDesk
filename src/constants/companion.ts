@@ -4,7 +4,7 @@ export function getCompanionHttpOrigin(): string {
   return (raw?.trim() || "http://127.0.0.1:8787").replace(/\/$/, "");
 }
 
-/** Path prefix that matches the companion’s HTTP pathname rules (same as sample mocks). */
+/** Path prefix that matches the companion’s HTTP pathname rules (same as mocks in the UI). */
 export function getCompanionApiBaseUrl(): string {
   return `${getCompanionHttpOrigin()}/api`;
 }

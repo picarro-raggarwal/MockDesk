@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppStore } from "@/store/useAppStore";
 import { displayApiPath } from "@/utils/pathJoin";
+import { GuideHint } from "@/components/GuideHint";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -66,7 +67,10 @@ export function CollectionEditorPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{isNew ? "New collection" : "Edit collection"}</h1>
+        <div className="flex items-start gap-2">
+          <h1 className="text-3xl font-bold tracking-tight">{isNew ? "New collection" : "Edit collection"}</h1>
+          <GuideHint section="collections-apis" className="mt-1 shrink-0" />
+        </div>
         <p className="mt-1 text-muted-foreground">
           {isNew
             ? "Name your collection, then click Create collection. Data is stored in this browser only."

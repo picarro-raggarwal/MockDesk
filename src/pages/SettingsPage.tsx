@@ -2,6 +2,17 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { HardDrive, RefreshCw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useAppStore, exportAppJson, parseImportJson } from "@/store/useAppStore";
@@ -9,6 +20,7 @@ import { APP_VERSION } from "@/constants/version";
 import { estimateLocalStorageBytes, formatBytes } from "@/utils/storageUsage";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { GuideHint } from "@/components/GuideHint";
 
 export function SettingsPage() {
   const collections = useAppStore((s) => s.collections);
@@ -27,7 +39,10 @@ export function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <div className="flex items-start gap-2">
+          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <GuideHint section="import-export-share" className="mt-1 shrink-0" />
+        </div>
         <p className="mt-1 text-muted-foreground">
           Theme: use <strong className="font-medium text-foreground">Appearance</strong> in the sidebar footer (or the
           compact control in the header on narrow screens).
@@ -102,23 +117,55 @@ export function SettingsPage() {
           <CardDescription>Clearing storage cannot be undone. Export first if you need a copy.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            onClick={() => {
-              if (confirm("Remove all mock APIs? Collections stay; APIs are cleared.")) clearAllApis();
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-            Clear all APIs
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => {
-              if (confirm("Reset entire app (APIs + collections + theme preference)?")) resetApp();
-            }}
-          >
-            Reset app
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button type="button" variant="outline">
+                <Trash2 className="h-4 w-4" />
+                Clear all APIs
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Clear all APIs?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This removes every mock API. Collections, environments, and WebSocket scenarios stay unchanged. It
+                  cannot be undone — export a backup first if you need a copy.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+                <AlertDialogAction asChild>
+                  <Button type="button" variant="destructive" onClick={() => clearAllApis()}>
+                    Clear all APIs
+                  </Button>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button type="button" variant="destructive">
+                Reset app
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Reset entire app?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This clears all APIs, collections, and WebSocket scenarios, sets theme to light, and restores default
+                  environments. It cannot be undone. Export a backup first if you need a copy.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+                <AlertDialogAction asChild>
+                  <Button type="button" variant="destructive" onClick={() => resetApp()}>
+                    Reset app
+                  </Button>
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
     </div>

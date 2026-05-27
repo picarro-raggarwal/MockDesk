@@ -125,293 +125,6 @@ function createBlankApi(collectionId: string | null): MockApi {
   };
 }
 
-const sampleCollection: Collection = {
-  id: "col_sample_auth",
-  name: "Auth APIs",
-  description: "Sample authentication mocks",
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-
-const sampleUsersCollection: Collection = {
-  id: "col_sample_users",
-  name: "User APIs",
-  description: "Sample user resource mocks",
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-
-const samplePlatformCollection: Collection = {
-  id: "col_sample_platform",
-  name: "Platform",
-  description: "Health checks and meta endpoints (sample)",
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-
-const sampleCommerceCollection: Collection = {
-  id: "col_sample_commerce",
-  name: "Commerce (sample)",
-  description: "Orders and catalog-style dummy responses",
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-
-function sampleApis(): MockApi[] {
-  const t = nowIso();
-  const r1 = defaultResponse();
-  r1.statusCode = 200;
-  r1.delayMs = 300;
-  r1.bodyJson = JSON.stringify(
-    {
-      success: true,
-      token: "mock.jwt.token",
-      expiresIn: 3600,
-    },
-    null,
-    2,
-  );
-
-  const r401: MockResponse = {
-    id: newId(),
-    statusCode: 401,
-    delayMs: 0,
-    responseType: "error",
-    bodyJson: JSON.stringify(
-      {
-        success: false,
-        message: "Invalid credentials",
-        errorCode: "INVALID_TOKEN",
-      },
-      null,
-      2,
-    ),
-    name: "Unauthorized",
-    matchWhen: { query: { debug: "401" } },
-  };
-
-  const apiLogin: MockApi = {
-    id: "api_sample_login",
-    collectionId: sampleCollection.id,
-    name: "Login",
-    baseUrl: getCompanionApiBaseUrl(),
-    path: "/auth/login",
-    pathVersionPrefix: "",
-    method: "POST",
-    description: "Mock login — returns a fake JWT",
-    tags: ["auth", "public"],
-    headers: [{ id: newId(), key: "Content-Type", value: "application/json" }],
-    queryParams: [emptyPair()],
-    requestBodySchema: JSON.stringify({ email: "string", password: "string" }, null, 2),
-    responses: [r1, r401],
-    defaultResponseId: r1.id,
-    environmentId: null,
-    createdAt: t,
-    updatedAt: t,
-  };
-
-  const rUsers = defaultResponse();
-  rUsers.delayMs = 150;
-  rUsers.bodyJson = JSON.stringify(
-    [
-      { id: 1, name: "Ritik", email: "ritik@example.com" },
-      { id: 2, name: "Alex", email: "alex@example.com" },
-    ],
-    null,
-    2,
-  );
-
-  const apiUsers: MockApi = {
-    id: "api_sample_users",
-    collectionId: sampleUsersCollection.id,
-    name: "List users",
-    baseUrl: getCompanionApiBaseUrl(),
-    path: "/users",
-    pathVersionPrefix: "",
-    method: "GET",
-    description: "GET /api/users style list",
-    tags: ["users"],
-    headers: [emptyPair()],
-    queryParams: [{ id: newId(), key: "limit", value: "10" }],
-    responses: [rUsers],
-    defaultResponseId: rUsers.id,
-    environmentId: null,
-    createdAt: t,
-    updatedAt: t,
-  };
-
-  const rHealth = defaultResponse();
-  rHealth.delayMs = 50;
-  rHealth.bodyJson = JSON.stringify(
-    { status: "ok", service: "mockdesk-sample", uptimeSeconds: 86400 },
-    null,
-    2,
-  );
-
-  const apiHealth: MockApi = {
-    id: "api_sample_health",
-    collectionId: samplePlatformCollection.id,
-    name: "Health check",
-    baseUrl: getCompanionApiBaseUrl(),
-    path: "/health",
-    pathVersionPrefix: "",
-    method: "GET",
-    description: "Liveness probe style JSON",
-    tags: ["platform", "ops"],
-    headers: [emptyPair()],
-    queryParams: [emptyPair()],
-    responses: [rHealth],
-    defaultResponseId: rHealth.id,
-    environmentId: null,
-    createdAt: t,
-    updatedAt: t,
-  };
-
-  const rOrders = defaultResponse();
-  rOrders.bodyJson = JSON.stringify(
-    {
-      orders: [
-        { id: "ord_1001", total: 49.99, status: "paid" },
-        { id: "ord_1002", total: 12.0, status: "pending" },
-      ],
-      meta: { userScoped: "{{userId}}" },
-    },
-    null,
-    2,
-  );
-
-  const apiOrders: MockApi = {
-    id: "api_sample_orders",
-    collectionId: sampleCommerceCollection.id,
-    name: "List orders",
-    baseUrl: getCompanionApiBaseUrl(),
-    path: "/orders",
-    pathVersionPrefix: "",
-    method: "GET",
-    description: "Sample order list; response body uses {{userId}} from the active environment",
-    tags: ["commerce", "orders"],
-    headers: [emptyPair()],
-    queryParams: [{ id: newId(), key: "status", value: "paid" }],
-    responses: [rOrders],
-    defaultResponseId: rOrders.id,
-    environmentId: null,
-    createdAt: t,
-    updatedAt: t,
-  };
-
-  const rProfile = defaultResponse();
-  rProfile.bodyJson = JSON.stringify(
-    { id: "{{userId}}", displayName: "Demo user", plan: "{{featureFlag}}" },
-    null,
-    2,
-  );
-
-  const apiProfile: MockApi = {
-    id: "api_sample_profile_v1",
-    collectionId: sampleCommerceCollection.id,
-    name: "Profile (versioned path)",
-    baseUrl: getCompanionApiBaseUrl(),
-    path: "/profile",
-    pathVersionPrefix: "/v1",
-    method: "GET",
-    description: "Resolved route: /api/v1/profile — demonstrates pathVersionPrefix",
-    tags: ["commerce", "versioning"],
-    headers: [emptyPair()],
-    queryParams: [emptyPair()],
-    responses: [rProfile],
-    defaultResponseId: rProfile.id,
-    environmentId: null,
-    createdAt: t,
-    updatedAt: t,
-  };
-
-  const rProduct200 = defaultResponse();
-  rProduct200.bodyJson = JSON.stringify(
-    { id: "sku-42", name: "Wireless mouse", price: 29.99, currency: "USD" },
-    null,
-    2,
-  );
-  rProduct200.matchWhen = { query: { sku: "42" } };
-  rProduct200.name = "SKU 42";
-
-  const rProductDefault = defaultResponse();
-  rProductDefault.bodyJson = JSON.stringify(
-    { message: "Pass ?sku=42 for a conditional hit, or use this default product payload." },
-    null,
-    2,
-  );
-
-  const apiProduct: MockApi = {
-    id: "api_sample_product",
-    collectionId: sampleCommerceCollection.id,
-    name: "Product lookup",
-    baseUrl: getCompanionApiBaseUrl(),
-    path: "/products/detail",
-    pathVersionPrefix: "",
-    method: "GET",
-    description: "Try Playground path /api/products/detail?sku=42 vs without query",
-    tags: ["commerce", "conditional"],
-    headers: [emptyPair()],
-    queryParams: [
-      { id: newId(), key: "sku", value: "" },
-      { id: newId(), key: "region", value: "us" },
-    ],
-    responses: [rProduct200, rProductDefault],
-    defaultResponseId: rProductDefault.id,
-    environmentId: null,
-    createdAt: t,
-    updatedAt: t,
-  };
-
-  // ── Path-param demo ──────────────────────────────────────────────────────
-  const rUserById = defaultResponse();
-  rUserById.delayMs = 100;
-  rUserById.bodyJson = JSON.stringify(
-    {
-      id: "{{params.id}}",
-      name: "{{faker:person.fullName}}",
-      email: "{{faker:internet.email}}",
-      plan: "{{featureFlag}}",
-      requestedId: "{{id}}",
-    },
-    null,
-    2,
-  );
-
-  const rUserById404: MockResponse = {
-    id: newId(),
-    statusCode: 404,
-    delayMs: 0,
-    responseType: "error",
-    bodyJson: JSON.stringify({ message: "User not found", requestedId: "{{params.id}}" }, null, 2),
-    name: "Not found (debug=404)",
-    matchWhen: { query: { debug: "404" } },
-  };
-
-  const apiUserById: MockApi = {
-    id: "api_sample_user_by_id",
-    collectionId: sampleUsersCollection.id,
-    name: "Get user by ID",
-    baseUrl: getCompanionApiBaseUrl(),
-    path: "/users/:id",
-    pathVersionPrefix: "",
-    method: "GET",
-    description:
-      "Demonstrates path parameters — :id is extracted and available as {{params.id}} or {{id}} in the response body. Try /users/42 or /users/999?debug=404 in the Playground.",
-    tags: ["users", "path-params"],
-    headers: [emptyPair()],
-    queryParams: [{ id: newId(), key: "debug", value: "" }],
-    requestBodySchema: "",
-    responses: [rUserById404, rUserById],
-    defaultResponseId: rUserById.id,
-    environmentId: null,
-    createdAt: t,
-    updatedAt: t,
-  };
-
-  return [apiLogin, apiUsers, apiUserById, apiHealth, apiOrders, apiProfile, apiProduct];
-}
-
 function cloneApiForCollection(api: MockApi, newCollectionId: string): MockApi {
   const t = nowIso();
   const idMap = new Map<string, string>();
@@ -639,21 +352,17 @@ export const useAppStore = create<AppState>()(
       },
       seedSamplesIfEmpty: () => {
         const { apis, collections, environments, wsScenarios } = get();
-        if (apis.length === 0 && collections.length === 0) {
-          const envs = environments.length ? environments : defaultEnvironments();
-          set({
-            collections: [
-              sampleCollection,
-              sampleUsersCollection,
-              samplePlatformCollection,
-              sampleCommerceCollection,
-            ],
-            apis: sampleApis(),
-            environments: envs,
-            currentEnvId: get().currentEnvId ?? envs[0]?.id ?? null,
-            wsScenarios: wsScenarios.length ? wsScenarios : sampleWsScenarios(),
-          });
+        if (apis.length > 0 || collections.length > 0) return;
+        const patch: Partial<Pick<AppState, "environments" | "currentEnvId" | "wsScenarios">> = {};
+        if (environments.length === 0) {
+          const envs = defaultEnvironments();
+          patch.environments = envs;
+          patch.currentEnvId = get().currentEnvId ?? envs[0]?.id ?? null;
         }
+        if (wsScenarios.length === 0) {
+          patch.wsScenarios = sampleWsScenarios();
+        }
+        if (Object.keys(patch).length > 0) set(patch);
       },
       addEnvironment: (name) => {
         const t = nowIso();
@@ -741,27 +450,7 @@ export const useAppStore = create<AppState>()(
         if (!p) return currentState;
 
         let apis = normalizeApisForHydrate(p.apis ?? currentState.apis);
-        let collections = p.collections ?? currentState.collections;
-
-        // Backfill sample APIs that were added after the user's initial seed.
-        // We check by stable ID so this runs exactly once per missing entry.
-        const apiIds = new Set(apis.map((a) => a.id));
-        const allSamples = sampleApis();
-        for (const sample of allSamples) {
-          if (!apiIds.has(sample.id)) {
-            // Ensure the collection the sample belongs to exists too.
-            if (sample.collectionId && !collections.some((c) => c.id === sample.collectionId)) {
-              const colDef = [
-                sampleCollection,
-                sampleUsersCollection,
-                samplePlatformCollection,
-                sampleCommerceCollection,
-              ].find((c) => c.id === sample.collectionId);
-              if (colDef) collections = [...collections, colDef];
-            }
-            apis = [...apis, sample];
-          }
-        }
+        const collections = p.collections ?? currentState.collections;
 
         return {
           ...currentState,
@@ -779,6 +468,7 @@ export const useAppStore = create<AppState>()(
 
 export function exportAppJson(
   state: Pick<AppState, "collections" | "apis" | "environments" | "currentEnvId" | "wsScenarios">,
+  options?: { compact?: boolean },
 ): string {
   const payload = {
     version: "1.1" as const,
@@ -789,7 +479,7 @@ export function exportAppJson(
     currentEnvId: state.currentEnvId,
     wsScenarios: state.wsScenarios,
   };
-  return JSON.stringify(payload, null, 2);
+  return options?.compact ? JSON.stringify(payload) : JSON.stringify(payload, null, 2);
 }
 
 export function parseImportJson(text: string): ParsedExport | { error: string } {

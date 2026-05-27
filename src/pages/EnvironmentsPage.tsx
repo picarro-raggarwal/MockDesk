@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAppStore } from "@/store/useAppStore";
 import { newId } from "@/lib/utils";
 import type { AppEnvironment, KeyValuePair } from "@/types/models";
+import { GuideHint } from "@/components/GuideHint";
 
 function pairsOrDefault(rows: KeyValuePair[]): KeyValuePair[] {
   return rows.length ? rows : [{ id: newId(), key: "", value: "" }];
@@ -53,7 +54,10 @@ export function EnvironmentsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Environments</h1>
+          <div className="flex items-start gap-2">
+            <h1 className="text-3xl font-bold tracking-tight">Environments</h1>
+            <GuideHint section="environments-templates" className="mt-1 shrink-0" />
+          </div>
           <p className="mt-1 text-muted-foreground">
             No environments found. Reset the app or import a backup from Settings to restore defaults.
           </p>
@@ -66,7 +70,10 @@ export function EnvironmentsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Environments</h1>
+          <div className="flex items-start gap-2">
+            <h1 className="text-3xl font-bold tracking-tight">Environments</h1>
+            <GuideHint section="environments-templates" className="mt-1 shrink-0" />
+          </div>
           <p className="mt-1 text-muted-foreground">
             Variables power <code className="rounded bg-muted px-1 py-0.5 text-xs">{"{{KEY}}"}</code> templates in mock
             bodies and the Playground. The active environment is used at match time.
