@@ -21,6 +21,7 @@ import { newId } from "@/lib/utils";
 import { displayApiPath, displayApiPathWithQuery } from "@/utils/pathJoin";
 import { formatJsonString, tryParseJson } from "@/utils/json";
 import { getCompanionApiBaseUrl } from "@/constants/companion";
+import { GuideHint } from "@/components/GuideHint";
 
 const methods: HttpMethod[] = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
@@ -398,9 +399,12 @@ export function ApiEditorPage() {
             </Badge>
             <span className="truncate font-mono text-xs text-muted-foreground">{resolvedPath}</span>
           </div>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight">
-            {isNew ? "Create mock API" : "Edit mock API"}
-          </h1>
+          <div className="mt-2 flex items-start gap-2">
+            <h1 className="min-w-0 flex-1 text-3xl font-bold tracking-tight">
+              {isNew ? "Create mock API" : "Edit mock API"}
+            </h1>
+            <GuideHint section="collections-apis" className="mt-1 shrink-0" />
+          </div>
           <p className="mt-1 text-sm text-muted-foreground">
             {isNew
               ? "Fill in the details below and click Create mock API to save."

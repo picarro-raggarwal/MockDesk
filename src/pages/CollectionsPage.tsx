@@ -1,7 +1,12 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Search, Trash2 } from "lucide-react";
+import { Plus, Search, Trash2, Download } from "lucide-react";
+import {
+  buildCollectionExport,
+  collectionExportBasename,
+  stringifyCollectionExport,
+} from "@/services/collectionImportExport";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,9 +19,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppStore } from "@/store/useAppStore";
+import { GuideHint } from "@/components/GuideHint";
 export function CollectionsPage() {
   const collections = useAppStore((s) => s.collections);
   const apis = useAppStore((s) => s.apis);
+  const environments = useAppStore((s) => s.environments);
   const deleteCollection = useAppStore((s) => s.deleteCollection);
   const [delId, setDelId] = useState<string | null>(null);
   const [q, setQ] = useState("");
@@ -38,16 +45,36 @@ export function CollectionsPage() {
     return m;
   }, [apis]);
 
+  const exportCollectionJson = (e: MouseEvent<HTMLButtonElement>, collectionId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const slice = buildCollectionExport({ collections, apis, environments }, collectionId);
+    if (!slice) return;
+    const col = slice.collections[0];
+    const base = collectionExportBasename(col?.name ?? "collection");
+    const text = stringifyCollectionExport(slice);
+    const blob = new Blob([text], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `mockdesk-collection-${base}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Collections</h1>
-          <p className="mt-1 max-w-xl text-muted-foreground">
-            Group related mocks. <strong className="font-medium text-foreground">New collection</strong> asks for a
-            name — click <strong className="font-medium text-foreground">Create collection</strong> on the next
-            screen, then add APIs from the APIs page.
-          </p>
+        <div className="flex min-w-0 flex-1 items-start gap-2">
+          <div className="min-w-0">
+            <h1 className="text-3xl font-bold tracking-tight">Collections</h1>
+            <p className="mt-1 max-w-xl text-muted-foreground">
+              Group related mocks. <strong className="font-medium text-foreground">New collection</strong> asks for a
+              name — click <strong className="font-medium text-foreground">Create collection</strong> on the next
+              screen, then add APIs from the APIs page.
+            </p>
+          </div>
+          <GuideHint section="collections-apis" className="mt-1" />
         </div>
         <Button asChild>
           <Link to="/collections/new">
@@ -71,20 +98,35 @@ export function CollectionsPage() {
                 className="absolute inset-0 rounded-[inherit] ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 aria-label={`Open collection ${c.name}`}
               />
-              <CardHeader className="pointer-events-none flex flex-row items-start justify-between gap-2 space-y-0">
-                <div className="min-w-0">
+              <CardHeader className="pointer-events-none flex flex-row items-start justify-between gap-3 space-y-0">
+                <div className="min-w-0 flex-1 pr-1">
                   <CardTitle className="truncate">{c.name}</CardTitle>
                   <CardDescription className="line-clamp-2">{c.description || "No description"}</CardDescription>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="pointer-events-auto relative z-[1] shrink-0 text-destructive"
-                  onClick={(e) => { e.stopPropagation(); setDelId(c.id); }}
-                  aria-label="Delete collection"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="pointer-events-auto relative z-[1] flex shrink-0 items-center gap-0.5 self-start">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={(e) => exportCollectionJson(e, c.id)}
+                    aria-label={`Export collection ${c.name} as JSON`}
+                    title="Export collection JSON"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDelId(c.id);
+                    }}
+                    aria-label="Delete collection"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="pointer-events-none text-xs text-muted-foreground">
                 <p>

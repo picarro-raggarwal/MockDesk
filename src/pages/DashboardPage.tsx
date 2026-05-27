@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/useAppStore";
 import { displayApiPath } from "@/utils/pathJoin";
 import { DashboardOnboarding } from "@/components/DashboardOnboarding";
+import { GuideHint } from "@/components/GuideHint";
 
 export function DashboardPage() {
   const apis = useAppStore((s) => s.apis);
@@ -16,11 +17,14 @@ export function DashboardPage() {
     <div className="space-y-8">
       <DashboardOnboarding />
 
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="mt-2 text-muted-foreground">
-          Ship frontend features faster with configurable mock REST endpoints, delays, and status codes.
-        </p>
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="mt-2 text-muted-foreground">
+            Ship frontend features faster with configurable mock REST endpoints, delays, and status codes.
+          </p>
+        </div>
+        <GuideHint section="collections-apis" className="mt-1" />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -83,13 +87,15 @@ export function DashboardPage() {
               <Link
                 key={a.id}
                 to={`/apis/${a.id}`}
-                className="flex flex-col rounded-lg border bg-muted/20 p-3 text-sm transition-colors hover:bg-muted/40 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-1.5 rounded-lg border bg-muted/20 p-3 text-sm transition-colors hover:bg-muted/40 sm:flex-row sm:items-start sm:gap-3"
               >
-                <span className="font-mono text-xs font-medium text-primary">{a.method}</span>
-                <span className="mt-1 min-w-0 break-all font-mono text-xs text-muted-foreground sm:mt-0 sm:max-w-[55%]">
+                <span className="w-fit shrink-0 font-mono text-xs font-medium text-primary sm:w-16">{a.method}</span>
+                <span className="min-w-0 flex-1 break-all text-left font-mono text-xs text-muted-foreground">
                   {displayApiPath(a)}
                 </span>
-                <span className="mt-1 min-w-0 truncate text-foreground sm:mt-0 sm:max-w-[40%] sm:text-right">{a.name}</span>
+                <span className="min-w-0 max-w-full shrink-0 truncate text-left text-foreground sm:max-w-[min(12rem,32%)] sm:text-right">
+                  {a.name}
+                </span>
               </Link>
             ))}
           </CardContent>
