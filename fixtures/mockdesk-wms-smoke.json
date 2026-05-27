@@ -1,0 +1,60 @@
+{
+  "version": "1.1",
+  "exportedAt": "2026-05-26T00:00:00.000Z",
+  "collections": [],
+  "apis": [
+    {
+      "id": "api_fixture_users",
+      "collectionId": null,
+      "name": "List users (fixture)",
+      "baseUrl": "http://127.0.0.1:8787/api",
+      "path": "/users",
+      "pathVersionPrefix": "",
+      "method": "GET",
+      "description": "Default fixture GET /api/users when running the companion without UI sync.",
+      "tags": ["fixture"],
+      "headers": [{ "id": "h_u1", "key": "", "value": "" }],
+      "queryParams": [{ "id": "q_u1", "key": "", "value": "" }],
+      "responses": [
+        {
+          "id": "r_users",
+          "statusCode": 200,
+          "delayMs": 0,
+          "responseType": "success",
+          "bodyJson": "[\n  { \"id\": 1, \"name\": \"Ritik\", \"email\": \"ritik@example.com\" },\n  { \"id\": 2, \"name\": \"Alex\", \"email\": \"alex@example.com\" }\n]\n"
+        }
+      ],
+      "defaultResponseId": "r_users",
+      "createdAt": "2026-05-26T00:00:00.000Z",
+      "updatedAt": "2026-05-26T00:00:00.000Z"
+    },
+    {
+      "id": "api_fixture_health",
+      "collectionId": null,
+      "name": "Health (fixture)",
+      "baseUrl": "http://127.0.0.1:8787/api",
+      "path": "/health",
+      "pathVersionPrefix": "",
+      "method": "GET",
+      "description": "Default fixture GET /api/health.",
+      "tags": ["fixture"],
+      "headers": [{ "id": "h_h1", "key": "", "value": "" }],
+      "queryParams": [{ "id": "q_h1", "key": "", "value": "" }],
+      "responses": [
+        {
+          "id": "r_health",
+          "statusCode": 200,
+          "delayMs": 0,
+          "responseType": "success",
+          "bodyJson": "{ \"status\": \"ok\", \"service\": \"mockdesk-fixture\", \"uptimeSeconds\": 86400 }\n"
+        }
+      ],
+      "defaultResponseId": "r_health",
+      "createdAt": "2026-05-26T00:00:00.000Z",
+      "updatedAt": "2026-05-26T00:00:00.000Z"
+    }
+  ],
+  "environments": [],
+  "currentEnvId": null,
+  "wsScenarios": []
+}
