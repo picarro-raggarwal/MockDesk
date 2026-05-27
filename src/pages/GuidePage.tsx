@@ -21,15 +21,19 @@ const sections: {
   links?: { to: string; label: string }[];
 }[] = [
   {
-    title: "First run & sample data",
+    title: "First run",
     icon: BookOpen,
-    description: "Fresh installs seed collections, APIs, two environments, and WS scenarios when storage is empty.",
+    description:
+      "Fresh installs start with no APIs or collections. Default environments and optional WS lab scenarios are added when storage is empty.",
     bullets: [
-      "Open Dashboard — you should see sample counts for APIs, collections, and links to try flows.",
-      "Samples include Auth (login + conditional 401 via ?debug=401), Users, Platform (/health), Commerce (orders, versioned profile, conditional product by ?sku=42).",
-      "Switch environments under Environments to see {{userId}} and other variables change in templated responses.",
+      "Create a collection, then add APIs (or create APIs from the APIs page).",
+      "Open Dashboard for counts and quick links once you have mocks.",
+      "Switch environments under Environments to drive {{userId}} and other variables in response templates.",
     ],
-    links: [{ to: "/", label: "Dashboard" }],
+    links: [
+      { to: "/collections/new", label: "New collection" },
+      { to: "/", label: "Dashboard" },
+    ],
   },
   {
     title: "Collections & APIs",
@@ -53,7 +57,7 @@ const sections: {
     bullets: [
       "Use {{KEY}} for a variable from the active environment; {{env:KEY}} if you need an explicit prefix.",
       "Use {{faker:person.fullName}} style paths with @faker-js/faker for random demo data (see faker docs for segments).",
-      "Staging vs Local sample envs ship with different baseUrl, token, userId, and featureFlag values.",
+      "Default Local and Staging environments ship with different baseUrl, token, userId, and featureFlag values.",
     ],
     links: [{ to: "/environments", label: "Environments" }],
   },
@@ -62,9 +66,9 @@ const sections: {
     icon: Play,
     description: "Send method + path (or full URL). Parsed query and headers/body feed conditional matching.",
     bullets: [
-      "Example: POST /api/auth/login with default body → 200 token; same path with ?debug=401 → 401 response.",
-      "GET /api/products/detail?sku=42 hits the conditional product response; omit sku for the default message.",
-      "GET /api/v1/profile demonstrates version prefix + templates ({{userId}}, {{featureFlag}}).",
+      "Pick an API you created, or type a path that matches method + pathname rules.",
+      "Conditional responses: add matchWhen on query, headers, or bodyContains to branch without duplicating APIs.",
+      "Use path version prefix when the public URL includes e.g. /v1 before the endpoint path.",
     ],
     links: [{ to: "/playground", label: "Playground" }],
   },
@@ -119,8 +123,7 @@ export function GuidePage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Guide</h1>
         <p className="mt-2 max-w-3xl text-muted-foreground">
-          Working instructions for MockDesk: how sample data maps to features, where to click next, and how matching and
-          templates behave end-to-end.
+          Working instructions for MockDesk: where to click next, and how matching and templates behave end-to-end.
         </p>
       </div>
 
