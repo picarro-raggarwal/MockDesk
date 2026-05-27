@@ -1,5 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import {
   BookOpen,
   Boxes,
@@ -7,20 +8,25 @@ import {
   FolderKanban,
   Keyboard,
   Play,
+  Server,
   Upload,
   Webhook,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import type { GuideSectionId } from "@/constants/guideHints";
+import { GuideHint } from "@/components/GuideHint";
 
 const sections: {
+  id: GuideSectionId;
   title: string;
-  icon: typeof BookOpen;
+  icon: typeof FolderKanban;
   description: string;
   bullets: string[];
   links?: { to: string; label: string }[];
 }[] = [
   {
+    id: "first-run",
     title: "First run",
     icon: BookOpen,
     description:
@@ -36,6 +42,7 @@ const sections: {
     ],
   },
   {
+    id: "collections-apis",
     title: "Collections & APIs",
     icon: FolderKanban,
     description: "Group endpoints; each API has method, base URL, path, optional version prefix, headers, query docs, and multiple responses.",
@@ -51,6 +58,7 @@ const sections: {
     ],
   },
   {
+    id: "environments-templates",
     title: "Environments & templates",
     icon: Brackets,
     description: "Variables apply to the active environment when resolving mock response bodies in the Playground and engine.",
@@ -62,17 +70,34 @@ const sections: {
     links: [{ to: "/environments", label: "Environments" }],
   },
   {
+    id: "playground",
     title: "Playground",
     icon: Play,
     description: "Send method + path (or full URL). Parsed query and headers/body feed conditional matching.",
     bullets: [
-      "Pick an API you created, or type a path that matches method + pathname rules.",
+      "No collections or APIs are created for you — add mocks under Collections / APIs, then try paths here.",
       "Conditional responses: add matchWhen on query, headers, or bodyContains to branch without duplicating APIs.",
-      "Use path version prefix when the public URL includes e.g. /v1 before the endpoint path.",
+      "Use path version prefix when your service mounts under /api/v1/… while you keep a short path in the editor.",
+      "Templates like {{userId}} resolve from the active environment (Environments page).",
     ],
     links: [{ to: "/playground", label: "Playground" }],
   },
   {
+    id: "live-mock-gateway",
+    title: "Live mock gateway",
+    icon: Server,
+    description:
+      "Run the Node gateway from this repo so real HTTP clients hit the same mocks you edit in the app. In development, the UI pushes your workspace to the gateway automatically (debounced)—no export file per change.",
+    bullets: [
+      "Terminal: npm run live-mock — default port 8787 (override with PORT=…). Keep npm run dev open so MockDesk can POST to /__mockdesk/sync.",
+      "Call your APIs at the same origin + path as each mock’s base URL (e.g. http://127.0.0.1:8787 plus your API path). Import / Export has copy buttons for commands and the typical REST base.",
+      "Optional: set MOCKDESK_SYNC_SECRET on the gateway and VITE_LIVE_MOCK_SYNC_SECRET in .env so only your UI can sync. Use VITE_LIVE_MOCK_SYNC=0 to turn off UI pushes; VITE_LIVE_MOCK_SYNC_URL if the gateway is not on localhost.",
+      "Do not run live-mock and the file-based companion on the same port—use one process per port.",
+    ],
+    links: [{ to: "/import-export", label: "Import / Export" }],
+  },
+  {
+    id: "ws-lab",
     title: "WS lab",
     icon: Webhook,
     description:
@@ -85,21 +110,22 @@ const sections: {
     links: [{ to: "/ws-lab", label: "WS lab" }],
   },
   {
+    id: "import-export-share",
     title: "Import, export & share",
     icon: Upload,
     description: "v1.1 JSON includes collections, apis, environments, currentEnvId, and wsScenarios.",
     bullets: [
       "Merge preserves IDs where possible; overwrite replaces workspace state (except you can restore from a file).",
-      "OpenAPI tab imports operations as new APIs into a chosen collection.",
-      "Share link encodes a compressed backup in ?share= — landing with that query opens Import / Export.",
+      "Share links use ?share= (session-stored until you import). Data changes only after Merge, Overwrite, or Import as new collection.",
     ],
     links: [{ to: "/import-export", label: "Import / Export" }],
   },
   {
+    id: "companion-server",
     title: "Companion server (optional)",
     icon: Boxes,
     description:
-      "Node CLI: HTTP mocks with the same matchWhen rules as the Playground, plus WebSocket scenario streaming from the same v1.1 export.",
+      "Node CLI: HTTP mocks with the same matchWhen rules as the Playground, plus WebSocket scenario streaming from the same v1.1 export. Use this when you want a fixed JSON file (CI, no dev UI) instead of the live gateway above.",
     bullets: [
       "Run: npm run companion -- ./mockdesk-app.json — HTTP and WebSocket share PORT (default 8787).",
       "HTTP picks responses by matchWhen (query, headers, bodyContains) when set; otherwise defaultResponseId. {{env:…}} / {{KEY}} / {{faker:…}} are substituted from export environments.",
@@ -107,6 +133,7 @@ const sections: {
     links: [{ to: "/settings", label: "Settings (backup)" }],
   },
   {
+    id: "keyboard-shortcuts",
     title: "Keyboard shortcuts",
     icon: Keyboard,
     description: "Press ? outside inputs for the shortcut dialog. Chords: press g, then within ~1s:",
@@ -118,19 +145,38 @@ const sections: {
 ];
 
 export function GuidePage() {
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash || hash.length <= 1) return;
+    const id = decodeURIComponent(hash.slice(1));
+    const el = document.getElementById(id);
+    if (!el) return;
+    const t = window.setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+    return () => window.clearTimeout(t);
+  }, [hash]);
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Guide</h1>
-        <p className="mt-2 max-w-3xl text-muted-foreground">
-          Working instructions for MockDesk: where to click next, and how matching and templates behave end-to-end.
-        </p>
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-3xl font-bold tracking-tight">Guide</h1>
+          <p className="mt-2 max-w-3xl text-muted-foreground">
+            Working instructions for MockDesk: start with an empty workspace, create your own mocks, and learn how
+            matching and templates behave end-to-end.
+          </p>
+        </div>
+        <GuideHint section="keyboard-shortcuts" className="mt-1 shrink-0" />
       </div>
 
       <div className="grid gap-6">
         {sections.map((section, i) => (
           <motion.div
-            key={section.title}
+            key={section.id}
+            id={section.id}
+            className="scroll-mt-24"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: Math.min(i * 0.04, 0.2) }}

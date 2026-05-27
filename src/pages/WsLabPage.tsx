@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore } from "@/store/useAppStore";
 import type { WsScenario } from "@/types/models";
+import { GuideHint } from "@/components/GuideHint";
 
 const companionWsBase =
   (import.meta.env.VITE_COMPANION_WS_ORIGIN as string | undefined)?.replace(/\/$/, "") ?? "ws://127.0.0.1:8787";
@@ -158,7 +159,10 @@ export function WsLabPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">WebSocket lab</h1>
+        <div className="flex items-start gap-2">
+          <h1 className="text-3xl font-bold tracking-tight">WebSocket lab</h1>
+          <GuideHint section="ws-lab" className="mt-1 shrink-0" />
+        </div>
         <p className="mt-1 text-muted-foreground">
           Preview scenario scripts in the browser, or connect to the{" "}
           <strong className="font-medium text-foreground">MockDesk companion</strong> WebSocket server to stream the

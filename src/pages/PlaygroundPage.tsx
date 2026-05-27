@@ -13,6 +13,7 @@ import { buildRequestContext, executeMockWithDelay, matchMockRequest } from "@/s
 import type { HttpMethod } from "@/types/models";
 import { displayApiPath } from "@/utils/pathJoin";
 import { Textarea } from "@/components/ui/textarea";
+import { GuideHint } from "@/components/GuideHint";
 
 const methods: HttpMethod[] = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
@@ -22,14 +23,14 @@ export function PlaygroundPage() {
   const pathFromUrl = searchParams.get("path") ?? "";
   const methodFromUrl = searchParams.get("method") ?? "";
 
-  const [path, setPath] = useState(() => pathFromUrl || "/api/users");
+  const [path, setPath] = useState(() => pathFromUrl || "/api/example");
   const [method, setMethod] = useState<HttpMethod>(() => {
     const m = methodFromUrl as HttpMethod;
     return methods.includes(m) ? m : "GET";
   });
 
   useEffect(() => {
-    setPath(pathFromUrl || "/api/users");
+    setPath(pathFromUrl || "/api/example");
     const m = methodFromUrl as HttpMethod;
     setMethod(methods.includes(m) ? m : "GET");
   }, [pathFromUrl, methodFromUrl]);
@@ -91,7 +92,10 @@ export function PlaygroundPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Playground</h1>
+        <div className="flex items-start gap-2">
+          <h1 className="text-3xl font-bold tracking-tight">Playground</h1>
+          <GuideHint section="playground" className="mt-1 shrink-0" />
+        </div>
         <p className="mt-1 text-muted-foreground">Postman-lite: send a request against the in-browser mock engine.</p>
       </div>
 

@@ -427,13 +427,15 @@ export const useAppStore = create<AppState>()(
         const { apis, collections, environments, wsScenarios } = get();
         if (apis.length > 0 || collections.length > 0) return;
 
-        const patch: Partial<AppState> = {};
-        if (!environments.length) {
+        const patch: Partial<Pick<AppState, "environments" | "currentEnvId" | "wsScenarios">> = {};
+        if (environments.length === 0) {
           const envs = defaultEnvironments();
           patch.environments = envs;
           patch.currentEnvId = get().currentEnvId ?? envs[0]?.id ?? null;
         }
-        if (!wsScenarios.length) patch.wsScenarios = sampleWsScenarios();
+        if (wsScenarios.length === 0) {
+          patch.wsScenarios = sampleWsScenarios();
+        }
         if (Object.keys(patch).length > 0) set(patch);
       },
       addEnvironment: (name) => {
@@ -537,10 +539,8 @@ export const useAppStore = create<AppState>()(
 );
 
 export function exportAppJson(
-  state: Pick<
-    AppState,
-    "collections" | "apis" | "environments" | "currentEnvId" | "wsScenarios"
-  >
+  state: Pick<AppState, "collections" | "apis" | "environments" | "currentEnvId" | "wsScenarios">,
+  options?: { compact?: boolean },
 ): string {
   const payload = {
     version: "1.1" as const,
@@ -551,7 +551,7 @@ export function exportAppJson(
     currentEnvId: state.currentEnvId,
     wsScenarios: state.wsScenarios
   };
-  return JSON.stringify(payload, null, 2);
+  return options?.compact ? JSON.stringify(payload) : JSON.stringify(payload, null, 2);
 }
 
 export function parseImportJson(
