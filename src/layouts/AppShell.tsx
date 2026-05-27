@@ -86,7 +86,7 @@ function SidebarNav({ onNavigate, className }: { onNavigate?: () => void; classN
 export function AppShell() {
   useThemeClass();
   const navigate = useNavigate();
-  const seedSamplesIfEmpty = useAppStore((s) => s.seedSamplesIfEmpty);
+  const seedDefaultsIfEmpty = useAppStore((s) => s.seedDefaultsIfEmpty);
   const didSeed = useRef(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -94,13 +94,13 @@ export function AppShell() {
     const finish = () => {
       if (didSeed.current) return;
       didSeed.current = true;
-      seedSamplesIfEmpty();
+      seedDefaultsIfEmpty();
     };
     if (useAppStore.persist.hasHydrated()) finish();
     return useAppStore.persist.onFinishHydration(() => {
       finish();
     });
-  }, [seedSamplesIfEmpty]);
+  }, [seedDefaultsIfEmpty]);
 
   return (
     <TooltipProvider delayDuration={200}>

@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import {
+  BookOpen,
   Boxes,
   Brackets,
   FolderKanban,
@@ -24,6 +25,22 @@ const sections: {
   bullets: string[];
   links?: { to: string; label: string }[];
 }[] = [
+  {
+    id: "first-run",
+    title: "First run",
+    icon: BookOpen,
+    description:
+      "Fresh installs start with no APIs or collections. Default environments and optional WS lab scenarios are added when storage is empty.",
+    bullets: [
+      "Create a collection, then add APIs (or create APIs from the APIs page).",
+      "Open Dashboard for counts and quick links once you have mocks.",
+      "Switch environments under Environments to drive {{userId}} and other variables in response templates.",
+    ],
+    links: [
+      { to: "/collections/new", label: "New collection" },
+      { to: "/", label: "Dashboard" },
+    ],
+  },
   {
     id: "collections-apis",
     title: "Collections & APIs",
@@ -48,7 +65,7 @@ const sections: {
     bullets: [
       "Use {{KEY}} for a variable from the active environment; {{env:KEY}} if you need an explicit prefix.",
       "Use {{faker:person.fullName}} style paths with @faker-js/faker for random demo data (see faker docs for segments).",
-      "Staging vs Local sample envs ship with different baseUrl, token, userId, and featureFlag values.",
+      "Default Local and Staging environments ship with different baseUrl, token, userId, and featureFlag values.",
     ],
     links: [{ to: "/environments", label: "Environments" }],
   },
@@ -58,8 +75,9 @@ const sections: {
     icon: Play,
     description: "Send method + path (or full URL). Parsed query and headers/body feed conditional matching.",
     bullets: [
-      "No collections or APIs are created for you — add a collection and APIs under Collections / APIs, then try paths here.",
-      "Use path version prefix when your real service mounts under /api/v1/… while you keep a short path in the editor.",
+      "No collections or APIs are created for you — add mocks under Collections / APIs, then try paths here.",
+      "Conditional responses: add matchWhen on query, headers, or bodyContains to branch without duplicating APIs.",
+      "Use path version prefix when your service mounts under /api/v1/… while you keep a short path in the editor.",
       "Templates like {{userId}} resolve from the active environment (Environments page).",
     ],
     links: [{ to: "/playground", label: "Playground" }],
@@ -146,8 +164,8 @@ export function GuidePage() {
         <div className="min-w-0 flex-1">
           <h1 className="text-3xl font-bold tracking-tight">Guide</h1>
           <p className="mt-2 max-w-3xl text-muted-foreground">
-            Working instructions for MockDesk: how features fit together, where to click next, and how matching and
-            templates behave end-to-end.
+            Working instructions for MockDesk: start with an empty workspace, create your own mocks, and learn how
+            matching and templates behave end-to-end.
           </p>
         </div>
         <GuideHint section="keyboard-shortcuts" className="mt-1 shrink-0" />

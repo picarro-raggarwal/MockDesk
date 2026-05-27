@@ -14,13 +14,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { useAppStore, exportAppJson, parseImportJson } from "@/store/useAppStore";
-import { APP_VERSION } from "@/constants/version";
-import { estimateLocalStorageBytes, formatBytes } from "@/utils/storageUsage";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { GuideHint } from "@/components/GuideHint";
+import { APP_VERSION } from "@/constants/version";
+import { exportAppJson, parseImportJson, useAppStore } from "@/store/useAppStore";
+import { estimateLocalStorageBytes, formatBytes } from "@/utils/storageUsage";
 
 export function SettingsPage() {
   const collections = useAppStore((s) => s.collections);
@@ -87,7 +87,13 @@ export function SettingsPage() {
           <Separator />
           <div className="space-y-2">
             <Label htmlFor="restore">Paste backup JSON to restore</Label>
-            <Textarea id="restore" rows={6} value={backup} onChange={(e) => setBackup(e.target.value)} className="font-mono text-xs" />
+            <Textarea
+              id="restore"
+              rows={6}
+              value={backup}
+              onChange={(e) => setBackup(e.target.value)}
+              className="font-mono text-xs"
+            />
           </div>
           <div className="flex flex-wrap gap-2">
             <Button

@@ -1,11 +1,24 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import type { AppEnvironment, Collection, MockApi, MockResponse, ThemeMode, WsScenario } from "@/types/models";
+import {
+  getCompanionApiBaseUrl,
+  getCompanionHttpOrigin
+} from "@/constants/companion";
 import { newId, nowIso } from "@/lib/utils";
-import { ZodError } from "zod";
-import { appExportSchema, type ParsedExport } from "@/services/importExportSchema";
 import { appendAudit } from "@/services/auditLog";
-import { getCompanionApiBaseUrl, getCompanionHttpOrigin } from "@/constants/companion";
+import {
+  appExportSchema,
+  type ParsedExport
+} from "@/services/importExportSchema";
+import type {
+  AppEnvironment,
+  Collection,
+  MockApi,
+  MockResponse,
+  ThemeMode,
+  WsScenario
+} from "@/types/models";
+import { ZodError } from "zod";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 const STORAGE_KEY = "mockdesk-storage";
 
@@ -19,7 +32,7 @@ function defaultResponse(): MockResponse {
     statusCode: 200,
     delayMs: 0,
     responseType: "success",
-    bodyJson: "{\n  \"message\": \"Hello from MockDesk\"\n}",
+    bodyJson: '{\n  "message": "Hello from MockDesk"\n}'
   };
 }
 
@@ -35,10 +48,10 @@ function defaultEnvironments(): AppEnvironment[] {
         { id: newId(), key: "userId", value: "42" },
         { id: newId(), key: "featureFlag", value: "beta" },
         { id: newId(), key: "orderPrefix", value: "ORD-" },
-        { id: newId(), key: "tenant", value: "demo" },
+        { id: newId(), key: "tenant", value: "demo" }
       ],
       createdAt: t,
-      updatedAt: t,
+      updatedAt: t
     },
     {
       id: "env_demo_staging",
@@ -48,11 +61,11 @@ function defaultEnvironments(): AppEnvironment[] {
         { id: newId(), key: "token", value: "staging.token" },
         { id: newId(), key: "userId", value: "9001" },
         { id: newId(), key: "featureFlag", value: "all-on" },
-        { id: newId(), key: "orderPrefix", value: "STG-" },
+        { id: newId(), key: "orderPrefix", value: "STG-" }
       ],
       createdAt: t,
-      updatedAt: t,
-    },
+      updatedAt: t
+    }
   ];
 }
 
@@ -68,21 +81,33 @@ function sampleWsScenarios(): WsScenario[] {
         {
           id: newId(),
           delayMs: 0,
-          payloadJson: JSON.stringify({ event: "connected", channel: "notifications", tenant: "demo" }, null, 2),
+          payloadJson: JSON.stringify(
+            { event: "connected", channel: "notifications", tenant: "demo" },
+            null,
+            2
+          )
         },
         {
           id: newId(),
           delayMs: 450,
-          payloadJson: JSON.stringify({ event: "order.created", orderId: "ord_1001", amount: 49.99 }, null, 2),
+          payloadJson: JSON.stringify(
+            { event: "order.created", orderId: "ord_1001", amount: 49.99 },
+            null,
+            2
+          )
         },
         {
           id: newId(),
           delayMs: 500,
-          payloadJson: JSON.stringify({ event: "promo", message: "Free shipping until midnight" }, null, 2),
-        },
+          payloadJson: JSON.stringify(
+            { event: "promo", message: "Free shipping until midnight" },
+            null,
+            2
+          )
+        }
       ],
       createdAt: t,
-      updatedAt: t,
+      updatedAt: t
     },
     {
       id: "ws_sample_live_counter",
@@ -90,14 +115,30 @@ function sampleWsScenarios(): WsScenario[] {
       description: "Simple numeric ticker with staggered delays.",
       path: "/ws/live",
       messages: [
-        { id: newId(), delayMs: 0, payloadJson: JSON.stringify({ count: 0, label: "start" }, null, 2) },
-        { id: newId(), delayMs: 350, payloadJson: JSON.stringify({ count: 1 }, null, 2) },
-        { id: newId(), delayMs: 350, payloadJson: JSON.stringify({ count: 2 }, null, 2) },
-        { id: newId(), delayMs: 350, payloadJson: JSON.stringify({ count: 3, done: true }, null, 2) },
+        {
+          id: newId(),
+          delayMs: 0,
+          payloadJson: JSON.stringify({ count: 0, label: "start" }, null, 2)
+        },
+        {
+          id: newId(),
+          delayMs: 350,
+          payloadJson: JSON.stringify({ count: 1 }, null, 2)
+        },
+        {
+          id: newId(),
+          delayMs: 350,
+          payloadJson: JSON.stringify({ count: 2 }, null, 2)
+        },
+        {
+          id: newId(),
+          delayMs: 350,
+          payloadJson: JSON.stringify({ count: 3, done: true }, null, 2)
+        }
       ],
       createdAt: t,
-      updatedAt: t,
-    },
+      updatedAt: t
+    }
   ];
 }
 
@@ -121,7 +162,7 @@ function createBlankApi(collectionId: string | null): MockApi {
     defaultResponseId: r.id,
     environmentId: null,
     createdAt: t,
-    updatedAt: t,
+    updatedAt: t
   };
 }
 
@@ -131,7 +172,8 @@ function cloneApiForCollection(api: MockApi, newCollectionId: string): MockApi {
   for (const r of api.responses) idMap.set(r.id, newId());
   const responses = api.responses.map((r) => ({ ...r, id: idMap.get(r.id)! }));
   let newDef: string | null = null;
-  if (api.defaultResponseId) newDef = idMap.get(api.defaultResponseId) ?? responses[0]?.id ?? null;
+  if (api.defaultResponseId)
+    newDef = idMap.get(api.defaultResponseId) ?? responses[0]?.id ?? null;
   else newDef = responses[0]?.id ?? null;
   return {
     ...api,
@@ -143,7 +185,7 @@ function cloneApiForCollection(api: MockApi, newCollectionId: string): MockApi {
     headers: api.headers.map((h) => ({ ...h, id: newId() })),
     queryParams: api.queryParams.map((h) => ({ ...h, id: newId() })),
     createdAt: t,
-    updatedAt: t,
+    updatedAt: t
   };
 }
 
@@ -160,7 +202,7 @@ function normalizeApisForHydrate(apis: MockApi[]): MockApi[] {
   return apis.map((a) => ({
     ...a,
     pathVersionPrefix: a.pathVersionPrefix ?? "",
-    environmentId: a.environmentId ?? null,
+    environmentId: a.environmentId ?? null
   }));
 }
 
@@ -173,7 +215,10 @@ export interface AppState {
   wsScenarios: WsScenario[];
   setTheme: (t: ThemeMode) => void;
   addCollection: (name: string, description?: string) => Collection;
-  updateCollection: (id: string, patch: Partial<Pick<Collection, "name" | "description">>) => void;
+  updateCollection: (
+    id: string,
+    patch: Partial<Pick<Collection, "name" | "description">>
+  ) => void;
   deleteCollection: (id: string) => void;
   duplicateCollection: (id: string) => Collection | null;
   addApi: (collectionId?: string | null) => MockApi;
@@ -182,14 +227,25 @@ export interface AppState {
   duplicateApi: (id: string) => MockApi | null;
   clearAllApis: () => void;
   resetApp: () => void;
-  importData: (data: unknown, mode: "merge" | "overwrite") => { ok: true } | { ok: false; error: string };
-  seedSamplesIfEmpty: () => void;
+  importData: (
+    data: unknown,
+    mode: "merge" | "overwrite"
+  ) => { ok: true } | { ok: false; error: string };
+  seedDefaultsIfEmpty: () => void;
   addEnvironment: (name: string) => AppEnvironment;
-  updateEnvironment: (id: string, patch: Partial<Pick<AppEnvironment, "name" | "variables">>) => void;
+  updateEnvironment: (
+    id: string,
+    patch: Partial<Pick<AppEnvironment, "name" | "variables">>
+  ) => void;
   deleteEnvironment: (id: string) => void;
   setCurrentEnvId: (id: string | null) => void;
   addWsScenario: (name: string, path: string) => WsScenario;
-  updateWsScenario: (id: string, patch: Partial<Pick<WsScenario, "name" | "description" | "path" | "messages">>) => void;
+  updateWsScenario: (
+    id: string,
+    patch: Partial<
+      Pick<WsScenario, "name" | "description" | "path" | "messages">
+    >
+  ) => void;
   deleteWsScenario: (id: string) => void;
 }
 
@@ -199,7 +255,7 @@ const initialState = {
   apis: [] as MockApi[],
   environments: [] as AppEnvironment[],
   currentEnvId: null as string | null,
-  wsScenarios: [] as WsScenario[],
+  wsScenarios: [] as WsScenario[]
 };
 
 export const useAppStore = create<AppState>()(
@@ -209,7 +265,13 @@ export const useAppStore = create<AppState>()(
       setTheme: (theme) => set({ theme: theme === "dark" ? "dark" : "light" }),
       addCollection: (name, description) => {
         const t = nowIso();
-        const c: Collection = { id: newId(), name, description, createdAt: t, updatedAt: t };
+        const c: Collection = {
+          id: newId(),
+          name,
+          description,
+          createdAt: t,
+          updatedAt: t
+        };
         set((s) => ({ collections: [...s.collections, c] }));
         void appendAudit("collection", `Created "${name}"`);
         return c;
@@ -217,16 +279,18 @@ export const useAppStore = create<AppState>()(
       updateCollection: (id, patch) => {
         set((s) => ({
           collections: s.collections.map((c) =>
-            c.id === id ? { ...c, ...patch, updatedAt: nowIso() } : c,
-          ),
+            c.id === id ? { ...c, ...patch, updatedAt: nowIso() } : c
+          )
         }));
       },
       deleteCollection: (id) => {
         set((s) => ({
           collections: s.collections.filter((c) => c.id !== id),
           apis: s.apis.map((a) =>
-            a.collectionId === id ? { ...a, collectionId: null, updatedAt: nowIso() } : a,
-          ),
+            a.collectionId === id
+              ? { ...a, collectionId: null, updatedAt: nowIso() }
+              : a
+          )
         }));
         void appendAudit("collection", `Deleted collection ${id}`);
       },
@@ -240,16 +304,19 @@ export const useAppStore = create<AppState>()(
           id: newIdCol,
           name: `${col.name} (copy)`,
           createdAt: t,
-          updatedAt: t,
+          updatedAt: t
         };
         const clones = get()
           .apis.filter((a) => a.collectionId === id)
           .map((a) => cloneApiForCollection(a, newIdCol));
         set((s) => ({
           collections: [...s.collections, newCol],
-          apis: [...s.apis, ...clones],
+          apis: [...s.apis, ...clones]
         }));
-        void appendAudit("collection", `Duplicated collection "${col.name}" → ${clones.length} APIs`);
+        void appendAudit(
+          "collection",
+          `Duplicated collection "${col.name}" → ${clones.length} APIs`
+        );
         return newCol;
       },
       addApi: (collectionId = null) => {
@@ -261,8 +328,8 @@ export const useAppStore = create<AppState>()(
       updateApi: (id, patch) => {
         set((s) => ({
           apis: s.apis.map((a) =>
-            a.id === id ? { ...a, ...patch, id: a.id, updatedAt: nowIso() } : a,
-          ),
+            a.id === id ? { ...a, ...patch, id: a.id, updatedAt: nowIso() } : a
+          )
         }));
       },
       deleteApi: (id) => {
@@ -275,10 +342,14 @@ export const useAppStore = create<AppState>()(
         const t = nowIso();
         const idMap = new Map<string, string>();
         for (const r of src.responses) idMap.set(r.id, newId());
-        const cloneResponses = src.responses.map((r) => ({ ...r, id: idMap.get(r.id)! }));
+        const cloneResponses = src.responses.map((r) => ({
+          ...r,
+          id: idMap.get(r.id)!
+        }));
         let newDef: string | null = null;
         if (src.defaultResponseId) {
-          newDef = idMap.get(src.defaultResponseId) ?? cloneResponses[0]?.id ?? null;
+          newDef =
+            idMap.get(src.defaultResponseId) ?? cloneResponses[0]?.id ?? null;
         } else {
           newDef = cloneResponses[0]?.id ?? null;
         }
@@ -291,7 +362,7 @@ export const useAppStore = create<AppState>()(
           headers: src.headers.map((h) => ({ ...h, id: newId() })),
           queryParams: src.queryParams.map((h) => ({ ...h, id: newId() })),
           createdAt: t,
-          updatedAt: t,
+          updatedAt: t
         };
         set((s) => ({ apis: [...s.apis, copy] }));
         void appendAudit("api", `Duplicated API "${src.name}"`);
@@ -309,7 +380,7 @@ export const useAppStore = create<AppState>()(
           theme: "light",
           environments: envs,
           currentEnvId: envs[0]?.id ?? null,
-          wsScenarios: [],
+          wsScenarios: []
         });
         void appendAudit("app", "Full reset");
       },
@@ -323,9 +394,11 @@ export const useAppStore = create<AppState>()(
           set({
             collections: d.collections,
             apis: d.apis,
-            environments: d.environments.length ? d.environments : defaultEnvironments(),
+            environments: d.environments.length
+              ? d.environments
+              : defaultEnvironments(),
             currentEnvId: d.currentEnvId ?? d.environments[0]?.id ?? null,
-            wsScenarios: d.wsScenarios,
+            wsScenarios: d.wsScenarios
           });
           void appendAudit("import", "Overwrite import");
           return { ok: true };
@@ -344,15 +417,16 @@ export const useAppStore = create<AppState>()(
             apis: [...apiById.values()],
             environments: [...envById.values()],
             wsScenarios: [...wsById.values()],
-            currentEnvId: d.currentEnvId ?? s.currentEnvId,
+            currentEnvId: d.currentEnvId ?? s.currentEnvId
           };
         });
         void appendAudit("import", "Merge import");
         return { ok: true };
       },
-      seedSamplesIfEmpty: () => {
+      seedDefaultsIfEmpty: () => {
         const { apis, collections, environments, wsScenarios } = get();
         if (apis.length > 0 || collections.length > 0) return;
+
         const patch: Partial<Pick<AppState, "environments" | "currentEnvId" | "wsScenarios">> = {};
         if (environments.length === 0) {
           const envs = defaultEnvironments();
@@ -371,7 +445,7 @@ export const useAppStore = create<AppState>()(
           name,
           variables: [emptyPair()],
           createdAt: t,
-          updatedAt: t,
+          updatedAt: t
         };
         set((s) => ({ environments: [...s.environments, e] }));
         void appendAudit("env", `Created environment "${name}"`);
@@ -380,8 +454,8 @@ export const useAppStore = create<AppState>()(
       updateEnvironment: (id, patch) => {
         set((s) => ({
           environments: s.environments.map((e) =>
-            e.id === id ? { ...e, ...patch, updatedAt: nowIso() } : e,
-          ),
+            e.id === id ? { ...e, ...patch, updatedAt: nowIso() } : e
+          )
         }));
       },
       deleteEnvironment: (id) => {
@@ -389,7 +463,8 @@ export const useAppStore = create<AppState>()(
           const nextEnvs = s.environments.filter((e) => e.id !== id);
           return {
             environments: nextEnvs,
-            currentEnvId: s.currentEnvId === id ? nextEnvs[0]?.id ?? null : s.currentEnvId,
+            currentEnvId:
+              s.currentEnvId === id ? (nextEnvs[0]?.id ?? null) : s.currentEnvId
           };
         });
         void appendAudit("env", `Deleted environment ${id}`);
@@ -406,11 +481,11 @@ export const useAppStore = create<AppState>()(
             {
               id: newId(),
               delayMs: 0,
-              payloadJson: JSON.stringify({ event: "hello", data: {} }, null, 2),
-            },
+              payloadJson: JSON.stringify({ event: "hello", data: {} }, null, 2)
+            }
           ],
           createdAt: t,
-          updatedAt: t,
+          updatedAt: t
         };
         set((s) => ({ wsScenarios: [...s.wsScenarios, w] }));
         void appendAudit("ws", `Created WS scenario "${name}"`);
@@ -419,13 +494,13 @@ export const useAppStore = create<AppState>()(
       updateWsScenario: (id, patch) => {
         set((s) => ({
           wsScenarios: s.wsScenarios.map((w) =>
-            w.id === id ? { ...w, ...patch, updatedAt: nowIso() } : w,
-          ),
+            w.id === id ? { ...w, ...patch, updatedAt: nowIso() } : w
+          )
         }));
       },
       deleteWsScenario: (id) => {
         set((s) => ({ wsScenarios: s.wsScenarios.filter((w) => w.id !== id) }));
-      },
+      }
     }),
     {
       name: STORAGE_KEY,
@@ -436,7 +511,7 @@ export const useAppStore = create<AppState>()(
         apis: s.apis,
         environments: s.environments,
         currentEnvId: s.currentEnvId,
-        wsScenarios: s.wsScenarios,
+        wsScenarios: s.wsScenarios
       }),
       merge: (persistedState, currentState) => {
         const p = persistedState as Partial<{
@@ -449,21 +524,18 @@ export const useAppStore = create<AppState>()(
         }> | null;
         if (!p) return currentState;
 
-        let apis = normalizeApisForHydrate(p.apis ?? currentState.apis);
-        const collections = p.collections ?? currentState.collections;
-
         return {
           ...currentState,
           theme: p.theme ?? currentState.theme,
-          collections,
-          apis,
+          collections: p.collections ?? currentState.collections,
+          apis: normalizeApisForHydrate(p.apis ?? currentState.apis),
           environments: p.environments ?? currentState.environments,
           currentEnvId: p.currentEnvId ?? currentState.currentEnvId,
-          wsScenarios: p.wsScenarios ?? currentState.wsScenarios,
+          wsScenarios: p.wsScenarios ?? currentState.wsScenarios
         };
-      },
-    },
-  ),
+      }
+    }
+  )
 );
 
 export function exportAppJson(
@@ -477,12 +549,14 @@ export function exportAppJson(
     apis: state.apis,
     environments: state.environments,
     currentEnvId: state.currentEnvId,
-    wsScenarios: state.wsScenarios,
+    wsScenarios: state.wsScenarios
   };
   return options?.compact ? JSON.stringify(payload) : JSON.stringify(payload, null, 2);
 }
 
-export function parseImportJson(text: string): ParsedExport | { error: string } {
+export function parseImportJson(
+  text: string
+): ParsedExport | { error: string } {
   try {
     const raw = JSON.parse(text) as unknown;
     const parsed = appExportSchema.safeParse(raw);
@@ -497,7 +571,7 @@ export function parseImportJson(text: string): ParsedExport | { error: string } 
 
 export function buildEnvVariableMap(
   environments: AppEnvironment[],
-  currentEnvId: string | null,
+  currentEnvId: string | null
 ): Record<string, string> {
   const e = environments.find((x) => x.id === currentEnvId) ?? environments[0];
   if (!e) return {};

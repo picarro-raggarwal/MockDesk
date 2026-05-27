@@ -1,5 +1,6 @@
 /** Hash targets on `/guide` — keep in sync with `GuidePage` section `id`s. */
 export const GUIDE_SECTION_IDS = [
+  "first-run",
   "collections-apis",
   "environments-templates",
   "playground",
@@ -14,6 +15,8 @@ export type GuideSectionId = (typeof GUIDE_SECTION_IDS)[number];
 
 /** Short blurbs for the ⓘ menu; full detail stays on the Guide. */
 export const GUIDE_HINT_SUMMARY: Record<GuideSectionId, string> = {
+  "first-run":
+    "Fresh installs have no APIs or collections — create your own. Default environments and WS lab scenarios may seed when storage is empty.",
   "collections-apis":
     "Collections group mocks. Each API has method, paths, optional version prefix, multiple JSON responses, and optional matchWhen rules (query, headers, body).",
   "environments-templates":
